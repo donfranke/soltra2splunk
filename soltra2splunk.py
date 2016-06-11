@@ -1,5 +1,4 @@
-""" script:   pushtosplunk.py
-    purpose:  pulls latest intel from Soltra Edge Mongo database
+""" purpose:  pulls latest intel from Soltra Edge Mongo database
                 and pushes them to an open port listening on Splunk
 
               This pulls the latest indicators from the Soltra Edge database (mongo)
