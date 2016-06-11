@@ -5,9 +5,11 @@ Soltra Edge is an intelligence sharing platform used by FS-ISAC. More informatio
 
 # Usage
 ```
-python soltrasplunk.py
+python soltra2splunk.py
 ```
 
 # Requirements
 * Python 2.6+ (not guaranteed to work with Python 3)
+* pycurl
+* pymongo
 * Soltra Edge
