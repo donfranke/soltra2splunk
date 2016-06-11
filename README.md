@@ -7,5 +7,5 @@ python soltrasplunk.py
 ```
 
 # Requirements
-Python 2.6+ (not guaranteed to work with Python 3)
-Soltra Edge
+* Python 2.6+ (not guaranteed to work with Python 3)
+* Soltra Edge
