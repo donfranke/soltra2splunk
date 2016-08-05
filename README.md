@@ -20,3 +20,8 @@ To get this script running on Soltra Edge, I had to reinstall the pymongo librar
 * git clone git://github.com/mongodb/mongo-python-driver.git pymongo
 * cd pymongo
 * python setup.py install
+
+I also had to reinstall the netaddr library using these steps:
+* git clone https://github.com/drkjam/netaddr.git netaddr2 
+* cd pymongo
+* python setup.py install
