@@ -12,4 +12,11 @@ python soltra2splunk.py
 * Python 2.6+ (not guaranteed to work with Python 3)
 * pycurl
 * pymongo
+# netaddr
 * Soltra Edge
+
+# Notes
+To get this script running on Soltra Edge, I had to reinstall the pymongo library using these steps:
+* git clone git://github.com/mongodb/mongo-python-driver.git pymongo
+* cd pymongo
+* python setup.py install
