@@ -13,8 +13,6 @@
     updated:  22 Dec 2015, Don Franke
     updated:  10 Jun 2016, Don Franke
     updated:  16 Jun 2016, Don Franke - added validate function to filter out RFC 1918/1122 IPs
-    updated:  10 Aug 2016, Don Franke - cleaned up domain regex, broke out domain and ip collection
-                                          into separate routines for support/readability
 """
 import re
 from pymongo import MongoClient
@@ -35,6 +33,7 @@ oList = []
 aList = []
 
 def validate(itype, ivalue):
+  #print "Type:" + itype + " Value: " + ivalue + "\n"
   isValid=True
   if(itype=="ip_address"):
     try:
@@ -42,17 +41,22 @@ def validate(itype, ivalue):
 
       ipset = IPSet(['10.0.0.0/8']) # RFC 1918
       isValid = not (ip in ipset)
+      #print "\t" + ivalue + " is " + str(isValid) + "\n"
 
       ipset = IPSet(['172.16.0.0/12']) # RFC 1918
       isValid = not (ip in ipset)
+      #print "\t" + ivalue + " is " + str(isValid) + "\n"
 
       ipset = IPSet(['192.168.0.0/16']) # RFC 1918
       isValid = not (ip in ipset)
+      #print "\t" + ivalue + " is " + str(isValid) + "\n"
 
       ipset = IPSet(['127.0.0.1/32']) # RFC 1122
       isValid = not (ip in ipset)
+      #print "\t" + ivalue + " is " + str(isValid) + "\n"
 
     except:
+        ###print "ERROR - " , ivalue , " INVALID IP ADDRESS"
         isValid = False
 
   return isValid
@@ -81,7 +85,10 @@ content = ""
 # get new indicators from mongo database
 ipv4regex = "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])"
 ipv4cidrregex = "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))"
-domainregex="^([a-zA-Z0-9-_]{1,61})(\.[a-zA-Z0-9-_]{1,61}){1,5}?$"
+#domainregex="^([a-zA-Z0-9-_]{1,61})(\.[a-zA-Z0-9-_]{1,61}){1,5}?$"
+#domainregex="^((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$^"
+#domainregex="(([a-zA-Z]{1})|([a-zA-Z]{1}[a-zA-Z]{1})|([a-zA-Z]{1}[0-9]{1})|([0-9]{1}[a-zA-Z]{1})|([a-zA-Z0-9][a-zA-Z0-9-_]{1,61}[a-zA-Z0-9]))\.([a-zA-Z]{2,6}|[a-zA-Z0-9-]{2,30}\.[a-zA-Z]{2,3})"
+domainregex="^(http(s)?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[-a-zA-Z0-9@:%._\S~#=]{1,10}"
 
 # ============ get ip addresses =============
 # query mongo db
@@ -142,6 +149,7 @@ for d in result:
   x.oCreatedBy=createdby
   oList.append(x)
 
+#sys.exit(0)
 # get matching activities (if any)
 collection=db.activity.log
 
@@ -155,18 +163,25 @@ for y in oList:
 
 # if indicator is in deprecated list, ignore
 for z in oList:
+  #print "Type: " + z.oType + " Value: " + z.oValue + "\n"
+
+#  print z.oID + "\n"
   if (z.oID in aList): 
     pass
+    #print z.oID,"is INVALID"
   else:
     if z.oType=="ip_address" or z.oType=="domain":
+      #print z.oValue
       if(z.oValue.find("/")==-1 and z.oValue.count(".")==3 and validate(z.oType,z.oValue)):
         content = content + todaystring + ",Soltra Edge," + z.oCreatedDate + "," + z.oType + "," + z.oValue + "," + z.oCreatedBy + "," + z.oID + "\n"
       else:
         pass
+        # print z.oValue,"is INVALID"
 
-  # print content
-  
+#print content
+
 # write to log file that will be picked up by splunk
+#sys.exit(0)
 with open("/var/log/pushtosplunk.log", "a") as myfile:
     myfile.write(content)
     myfile.close()
